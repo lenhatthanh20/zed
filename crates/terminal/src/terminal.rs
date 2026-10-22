@@ -1078,6 +1078,7 @@ impl TerminalBuilder {
             path_style,
             cwd_history: Vec::new(),
             pending_cwd_boundary: None,
+            display_only_input: None,
             #[cfg(any(test, feature = "test-support"))]
             input_log: Vec::new(),
             #[cfg(test)]
@@ -1380,6 +1381,7 @@ impl TerminalBuilder {
                         .unwrap_or_default()
                 },
                 pending_cwd_boundary: None,
+                display_only_input: None,
                 #[cfg(any(test, feature = "test-support"))]
                 input_log: Vec::new(),
                 #[cfg(test)]
@@ -1565,6 +1567,8 @@ pub struct Terminal {
     path_style: PathStyle,
     cwd_history: Vec<CwdHistoryEntry>,
     pending_cwd_boundary: Option<i32>,
+    /// Where a display-only terminal sends the bytes a PTY terminal writes to its PTY.
+    display_only_input: Option<futures::channel::mpsc::UnboundedSender<Vec<u8>>>,
     #[cfg(any(test, feature = "test-support"))]
     input_log: Vec<Vec<u8>>,
     #[cfg(test)]
@@ -2211,7 +2215,22 @@ impl Terminal {
                 }
             }
             pty_tx.notify(input);
+        } else if let Some(sink) = &self.display_only_input {
+            sink.unbounded_send(input.into_owned()).ok();
         }
+    }
+
+    /// Sends what this display-only terminal would write to a PTY (keys, pastes, IME text and
+    /// answers to terminal queries) to `sink`, so a client of a remote PTY can pass it on.
+    pub fn set_display_only_input(
+        &mut self,
+        sink: futures::channel::mpsc::UnboundedSender<Vec<u8>>,
+    ) -> Result<()> {
+        if !matches!(self.terminal_type, TerminalType::DisplayOnly) {
+            bail!("only a display-only terminal takes an input sink");
+        }
+        self.display_only_input = Some(sink);
+        Ok(())
     }
 
     pub fn input(&mut self, input: impl Into<Cow<'static, [u8]>>) {
@@ -5240,6 +5259,34 @@ mod tests {
                 cx.update(|cx| cx.read_from_clipboard().and_then(|item| item.text()));
             assert_eq!(clipboard_text.as_deref(), Some("original"));
         }
+    }
+
+    #[gpui::test]
+    async fn test_display_only_input_goes_to_its_sink(cx: &mut TestAppContext) {
+        cx.update(|cx| {
+            let settings_store = settings::SettingsStore::test(cx);
+            cx.set_global(settings_store);
+        });
+        let terminal = cx.new(|cx| {
+            TerminalBuilder::new_display_only(
+                SettingsCursorShape::default(),
+                AlternateScroll::On,
+                None,
+                0,
+                cx.background_executor(),
+                PathStyle::local(),
+            )
+            .subscribe(cx)
+        });
+        let (sink, mut received) = futures::channel::mpsc::unbounded();
+        terminal.update(cx, |terminal, _| {
+            terminal.set_display_only_input(sink).unwrap();
+            terminal.input(b"ls\r".to_vec());
+            terminal.paste("echo");
+        });
+        cx.run_until_parked();
+        assert_eq!(received.try_next().unwrap(), Some(b"ls\r".to_vec()));
+        assert!(received.try_next().unwrap().is_some());
     }
 
     mod hyperlinks {
