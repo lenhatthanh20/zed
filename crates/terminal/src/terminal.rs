@@ -762,6 +762,36 @@ enum PtyEvent {
     Event(TerminalBackendEvent, u64),
 }
 
+/// The most output a [`DisplayOnlyWriter`] parses under one lock of the terminal, so a frame
+/// never waits long for it.
+const DISPLAY_ONLY_LOCKED_WRITE: usize = 16 * 1024;
+
+/// Parses the output of a display-only terminal on any thread, as the event loop of a PTY
+/// terminal does, so a client of a remote PTY keeps parsing off the main thread. Get one with
+/// [`Terminal::display_only_writer`]. After [`Terminal::replace_display_output`] it writes to the
+/// old screen, which is no longer shown: get a new one.
+pub struct DisplayOnlyWriter {
+    term: Arc<AlacrittyTermLock>,
+    processor: Processor<StdSyncHandler>,
+    events_tx: futures::channel::mpsc::UnboundedSender<PtyEvent>,
+    generation: u64,
+}
+
+impl DisplayOnlyWriter {
+    pub fn write(&mut self, bytes: &[u8]) {
+        for chunk in bytes.chunks(DISPLAY_ONLY_LOCKED_WRITE) {
+            let mut term = self.term.lock();
+            self.processor.advance(&mut *term, chunk);
+        }
+        self.events_tx
+            .unbounded_send(PtyEvent::Event(
+                TerminalBackendEvent::Wakeup,
+                self.generation,
+            ))
+            .ok();
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TerminalBounds {
     pub cell_width: Pixels,
@@ -2231,6 +2261,23 @@ impl Terminal {
         }
         self.display_only_input = Some(sink);
         Ok(())
+    }
+
+    /// A writer that parses this display-only terminal's output off the main thread, instead of
+    /// [`Terminal::write_raw_output`].
+    pub fn display_only_writer(&self) -> Result<DisplayOnlyWriter> {
+        if !matches!(self.terminal_type, TerminalType::DisplayOnly) || self.subprocess.is_some() {
+            bail!("only a display-only terminal takes a writer");
+        }
+        let Some(events_tx) = &self.output_events_tx else {
+            bail!("display-only terminal has no output event channel");
+        };
+        Ok(DisplayOnlyWriter {
+            term: self.term.clone(),
+            processor: Processor::<StdSyncHandler>::new(),
+            events_tx: events_tx.clone(),
+            generation: self.output_generation,
+        })
     }
 
     pub fn input(&mut self, input: impl Into<Cow<'static, [u8]>>) {
@@ -5287,6 +5334,60 @@ mod tests {
         cx.run_until_parked();
         assert_eq!(received.try_next().unwrap(), Some(b"ls\r".to_vec()));
         assert!(received.try_next().unwrap().is_some());
+    }
+
+    #[gpui::test]
+    async fn test_display_only_writer_parses_on_another_thread(cx: &mut TestAppContext) {
+        cx.update(|cx| {
+            let settings_store = settings::SettingsStore::test(cx);
+            cx.set_global(settings_store);
+        });
+        let terminal = cx.new(|cx| {
+            TerminalBuilder::new_display_only(
+                SettingsCursorShape::default(),
+                AlternateScroll::On,
+                None,
+                0,
+                cx.background_executor(),
+                PathStyle::local(),
+            )
+            .subscribe(cx)
+        });
+        let mut writer =
+            terminal.read_with(cx, |terminal, _| terminal.display_only_writer().unwrap());
+        let wakeups = std::rc::Rc::new(std::cell::Cell::new(0));
+        cx.update({
+            let wakeups = wakeups.clone();
+            |cx| {
+                cx.subscribe(&terminal, move |_, event, _| {
+                    if matches!(event, Event::Wakeup) {
+                        wakeups.set(wakeups.get() + 1);
+                    }
+                })
+                .detach();
+            }
+        });
+        std::thread::spawn(move || writer.write(b"off the main thread"))
+            .join()
+            .unwrap();
+        cx.run_until_parked();
+        assert!(terminal.read_with(cx, |terminal, _| {
+            terminal.get_content().contains("off the main thread")
+        }));
+        assert!(wakeups.get() > 0);
+
+        // A writer from before a replace writes to the old screen, which is not shown.
+        let mut old = terminal.read_with(cx, |terminal, _| terminal.display_only_writer().unwrap());
+        terminal.update(cx, |terminal, cx| {
+            terminal.replace_display_output(b"", cx).unwrap()
+        });
+        old.write(b"stale");
+        let mut new = terminal.read_with(cx, |terminal, _| terminal.display_only_writer().unwrap());
+        new.write(b"fresh");
+        cx.run_until_parked();
+        let content = terminal.read_with(cx, |terminal, _| terminal.get_content());
+        assert!(content.contains("fresh"));
+        assert!(!content.contains("stale"));
     }
 
     mod hyperlinks {
