@@ -603,7 +603,7 @@ dependencies = [
 [[package]]
 name = "alacritty_terminal"
 version = "0.26.1-dev"
-source = "git+https://github.com/zed-industries/alacritty?rev=4c129667ce56611becdc82de6e28218c80e2e88f#4c129667ce56611becdc82de6e28218c80e2e88f"
+source = "git+https://github.com/lenhatthanh20/alacritty?rev=4c129667ce56611becdc82de6e28218c80e2e88f#4c129667ce56611becdc82de6e28218c80e2e88f"
 dependencies = [
  "base64 0.22.1",
  "bitflags 2.13.1",
@@ -1118,7 +1118,7 @@ dependencies = [
 [[package]]
 name = "async-process"
 version = "2.5.0"
-source = "git+https://github.com/zed-industries/async-process.git?rev=0b6d6713570af61806e1e5cb40e0f757cb93fd9d#0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
+source = "git+https://github.com/lenhatthanh20/async-process.git?rev=0b6d6713570af61806e1e5cb40e0f757cb93fd9d#0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
 dependencies = [
  "async-channel 2.5.0",
  "async-io",
@@ -1214,7 +1214,7 @@ dependencies = [
 [[package]]
 name = "async-tar"
 version = "0.6.1"
-source = "git+https://github.com/zed-industries/async-tar?rev=bd3ad6f89df9a9da7a8535958756d6bf465936a0#bd3ad6f89df9a9da7a8535958756d6bf465936a0"
+source = "git+https://github.com/lenhatthanh20/async-tar?rev=bd3ad6f89df9a9da7a8535958756d6bf465936a0#bd3ad6f89df9a9da7a8535958756d6bf465936a0"
 dependencies = [
  "async-std",
  "filetime",
@@ -1227,7 +1227,7 @@ dependencies = [
 [[package]]
 name = "async-task"
 version = "4.7.1"
-source = "git+https://github.com/smol-rs/async-task.git?rev=b4486cd71e4e94fbda54ce6302444de14f4d190e#b4486cd71e4e94fbda54ce6302444de14f4d190e"
+source = "git+https://github.com/lenhatthanh20/async-task.git?rev=b4486cd71e4e94fbda54ce6302444de14f4d190e#b4486cd71e4e94fbda54ce6302444de14f4d190e"
 
 [[package]]
 name = "async-trait"
@@ -2637,7 +2637,7 @@ dependencies = [
 [[package]]
 name = "calloop"
 version = "0.14.3"
-source = "git+https://github.com/zed-industries/calloop?rev=3759371fee14c40066d64777e2a36b6ffcc22590#3759371fee14c40066d64777e2a36b6ffcc22590"
+source = "git+https://github.com/lenhatthanh20/calloop?rev=3759371fee14c40066d64777e2a36b6ffcc22590#3759371fee14c40066d64777e2a36b6ffcc22590"
 dependencies = [
  "bitflags 2.13.1",
  "polling",
@@ -4539,7 +4539,7 @@ dependencies = [
 [[package]]
 name = "dap-types"
 version = "0.0.1"
-source = "git+https://github.com/zed-industries/dap-types?rev=1b461b310481d01e02b2603c16d7144b926339f8#1b461b310481d01e02b2603c16d7144b926339f8"
+source = "git+https://github.com/lenhatthanh20/dap-types?rev=1b461b310481d01e02b2603c16d7144b926339f8#1b461b310481d01e02b2603c16d7144b926339f8"
 dependencies = [
  "schemars 1.0.4",
  "serde",
@@ -10404,7 +10404,7 @@ dependencies = [
 [[package]]
 name = "lsp-types"
 version = "0.95.1"
-source = "git+https://github.com/zed-industries/lsp-types?rev=f1783e63a7f4eb4397bf51d4148b4895a1f7ab16#f1783e63a7f4eb4397bf51d4148b4895a1f7ab16"
+source = "git+https://github.com/lenhatthanh20/lsp-types?rev=f1783e63a7f4eb4397bf51d4148b4895a1f7ab16#f1783e63a7f4eb4397bf51d4148b4895a1f7ab16"
 dependencies = [
  "bitflags 1.3.2",
  "serde",
@@ -11383,7 +11383,7 @@ dependencies = [
 [[package]]
 name = "notify"
 version = "9.0.0-rc.4"
-source = "git+https://github.com/zed-industries/notify?rev=d842f16b2716bd60f09caf3ae3a894237ab38f54#d842f16b2716bd60f09caf3ae3a894237ab38f54"
+source = "git+https://github.com/lenhatthanh20/notify?rev=d842f16b2716bd60f09caf3ae3a894237ab38f54#d842f16b2716bd60f09caf3ae3a894237ab38f54"
 dependencies = [
  "bitflags 2.13.1",
  "inotify",
@@ -11416,7 +11416,7 @@ dependencies = [
 [[package]]
 name = "notify-types"
 version = "2.1.0"
-source = "git+https://github.com/zed-industries/notify?rev=d842f16b2716bd60f09caf3ae3a894237ab38f54#d842f16b2716bd60f09caf3ae3a894237ab38f54"
+source = "git+https://github.com/lenhatthanh20/notify?rev=d842f16b2716bd60f09caf3ae3a894237ab38f54#d842f16b2716bd60f09caf3ae3a894237ab38f54"
 dependencies = [
  "bitflags 2.13.1",
 ]
@@ -14096,7 +14096,7 @@ dependencies = [
 [[package]]
 name = "proptest"
 version = "1.10.0"
-source = "git+https://github.com/proptest-rs/proptest?rev=3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b#3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b"
+source = "git+https://github.com/lenhatthanh20/proptest?rev=3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b#3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b"
 dependencies = [
  "bit-set 0.8.0",
  "bit-vec 0.8.0",
@@ -14126,7 +14126,7 @@ dependencies = [
 [[package]]
 name = "proptest-macro"
 version = "0.5.0"
-source = "git+https://github.com/proptest-rs/proptest?rev=3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b#3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b"
+source = "git+https://github.com/lenhatthanh20/proptest?rev=3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b#3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b"
 dependencies = [
  "convert_case 0.11.0",
  "proc-macro2",
@@ -18845,7 +18845,7 @@ dependencies = [
 [[package]]
 name = "trash"
 version = "5.2.5"
-source = "git+https://github.com/zed-industries/trash-rs?rev=41c6c800d884a89351f3b8856d12894cccee261d#41c6c800d884a89351f3b8856d12894cccee261d"
+source = "git+https://github.com/lenhatthanh20/trash-rs?rev=41c6c800d884a89351f3b8856d12894cccee261d#41c6c800d884a89351f3b8856d12894cccee261d"
 dependencies = [
  "chrono",
  "libc",
@@ -18863,7 +18863,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter"
 version = "0.27.0"
-source = "git+https://github.com/tree-sitter/tree-sitter?rev=43623ec9bf0eaaf7113285c46e8a09018f181b18#43623ec9bf0eaaf7113285c46e8a09018f181b18"
+source = "git+https://github.com/lenhatthanh20/tree-sitter?rev=43623ec9bf0eaaf7113285c46e8a09018f181b18#43623ec9bf0eaaf7113285c46e8a09018f181b18"
 dependencies = [
  "cc",
  "regex",
@@ -18896,7 +18896,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-cpp"
 version = "0.23.4"
-source = "git+https://github.com/tree-sitter/tree-sitter-cpp?rev=5cb9b693cfd7bfacab1d9ff4acac1a4150700609#5cb9b693cfd7bfacab1d9ff4acac1a4150700609"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-cpp?rev=5cb9b693cfd7bfacab1d9ff4acac1a4150700609#5cb9b693cfd7bfacab1d9ff4acac1a4150700609"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -18945,7 +18945,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-gitcommit"
 version = "0.0.1"
-source = "git+https://github.com/zed-industries/tree-sitter-git-commit?rev=88309716a69dd13ab83443721ba6e0b491d37ee9#88309716a69dd13ab83443721ba6e0b491d37ee9"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-git-commit?rev=88309716a69dd13ab83443721ba6e0b491d37ee9#88309716a69dd13ab83443721ba6e0b491d37ee9"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -18964,7 +18964,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-gomod"
 version = "1.1.1"
-source = "git+https://github.com/camdencheek/tree-sitter-go-mod?rev=2e886870578eeba1927a2dc4bd2e2b3f598c5f9a#2e886870578eeba1927a2dc4bd2e2b3f598c5f9a"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-go-mod?rev=2e886870578eeba1927a2dc4bd2e2b3f598c5f9a#2e886870578eeba1927a2dc4bd2e2b3f598c5f9a"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -18973,7 +18973,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-gowork"
 version = "0.0.1"
-source = "git+https://github.com/zed-industries/tree-sitter-go-work?rev=acb0617bf7f4fda02c6217676cc64acb89536dc7#acb0617bf7f4fda02c6217676cc64acb89536dc7"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-go-work?rev=acb0617bf7f4fda02c6217676cc64acb89536dc7#acb0617bf7f4fda02c6217676cc64acb89536dc7"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -19021,12 +19021,12 @@ dependencies = [
 [[package]]
 name = "tree-sitter-language"
 version = "0.1.8"
-source = "git+https://github.com/tree-sitter/tree-sitter?rev=43623ec9bf0eaaf7113285c46e8a09018f181b18#43623ec9bf0eaaf7113285c46e8a09018f181b18"
+source = "git+https://github.com/lenhatthanh20/tree-sitter?rev=43623ec9bf0eaaf7113285c46e8a09018f181b18#43623ec9bf0eaaf7113285c46e8a09018f181b18"
 
 [[package]]
 name = "tree-sitter-md"
 version = "0.3.2"
-source = "git+https://github.com/zed-industries/tree-sitter-markdown?rev=b596e737286780d7bfa9fcddceaeeb754574b352#b596e737286780d7bfa9fcddceaeeb754574b352"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-markdown?rev=b596e737286780d7bfa9fcddceaeeb754574b352#b596e737286780d7bfa9fcddceaeeb754574b352"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -19075,7 +19075,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-typescript"
 version = "0.23.2"
-source = "git+https://github.com/zed-industries/tree-sitter-typescript?rev=e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899#e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-typescript?rev=e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899#e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -19084,7 +19084,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-yaml"
 version = "0.6.1"
-source = "git+https://github.com/zed-industries/tree-sitter-yaml?rev=baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a#baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-yaml?rev=baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a#baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -19943,7 +19943,7 @@ dependencies = [
 [[package]]
 name = "wasm_thread"
 version = "0.3.3"
-source = "git+https://github.com/zed-industries/wasm_thread?rev=0cf96c7708dfb97ccf3da50347e25edcf75d6937#0cf96c7708dfb97ccf3da50347e25edcf75d6937"
+source = "git+https://github.com/lenhatthanh20/wasm_thread?rev=0cf96c7708dfb97ccf3da50347e25edcf75d6937#0cf96c7708dfb97ccf3da50347e25edcf75d6937"
 dependencies = [
  "futures 0.3.34",
  "js-sys",
@@ -22107,7 +22107,7 @@ checksum = "bec9e4a500ca8864c5b47b8b482a73d62e4237670e5b5f1d6b9e3cae50f28f2b"
 [[package]]
 name = "xim-ctext"
 version = "0.3.0"
-source = "git+https://github.com/zed-industries/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
+source = "git+https://github.com/lenhatthanh20/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
 dependencies = [
  "encoding_rs",
 ]
@@ -22115,7 +22115,7 @@ dependencies = [
 [[package]]
 name = "xim-parser"
 version = "0.2.1"
-source = "git+https://github.com/zed-industries/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
+source = "git+https://github.com/lenhatthanh20/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
 dependencies = [
  "bitflags 2.13.1",
 ]
@@ -22576,7 +22576,7 @@ dependencies = [
 [[package]]
 name = "zed-font-kit"
 version = "0.14.1-zed"
-source = "git+https://github.com/zed-industries/font-kit?rev=94b0f28166665e8fd2f53ff6d268a14955c82269#94b0f28166665e8fd2f53ff6d268a14955c82269"
+source = "git+https://github.com/lenhatthanh20/font-kit?rev=94b0f28166665e8fd2f53ff6d268a14955c82269#94b0f28166665e8fd2f53ff6d268a14955c82269"
 dependencies = [
  "bitflags 2.13.1",
  "byteorder",
@@ -22649,7 +22649,7 @@ dependencies = [
 [[package]]
 name = "zed-scap"
 version = "0.0.8-zed"
-source = "git+https://github.com/zed-industries/scap?rev=4afea48c3b002197176fb19cd0f9b180dd36eaac#4afea48c3b002197176fb19cd0f9b180dd36eaac"
+source = "git+https://github.com/lenhatthanh20/scap?rev=4afea48c3b002197176fb19cd0f9b180dd36eaac#4afea48c3b002197176fb19cd0f9b180dd36eaac"
 dependencies = [
  "anyhow",
  "cocoa 0.25.0",
@@ -22670,7 +22670,7 @@ dependencies = [
 [[package]]
 name = "zed-xim"
 version = "0.4.0-zed"
-source = "git+https://github.com/zed-industries/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
+source = "git+https://github.com/lenhatthanh20/xim-rs.git?rev=16f35a2c881b815a2b6cdfd6687988e84f8447d8#16f35a2c881b815a2b6cdfd6687988e84f8447d8"
 dependencies = [
  "ahash",
  "hashbrown 0.14.5",
