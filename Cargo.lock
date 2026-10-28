@@ -19084,7 +19084,7 @@ dependencies = [
 [[package]]
 name = "tree-sitter-yaml"
 version = "0.6.1"
-source = "git+https://github.com/lenhatthanh20/tree-sitter-yaml?rev=baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a#baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a"
+source = "git+https://github.com/lenhatthanh20/tree-sitter-yaml?rev=dcb586e3ffe00a42b0f2d03a67ea153acb31ff09#dcb586e3ffe00a42b0f2d03a67ea153acb31ff09"
 dependencies = [
  "cc",
  "tree-sitter-language",
