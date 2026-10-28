@@ -3616,6 +3616,45 @@ mod tests {
     }
 
     #[gpui::test]
+    async fn test_only_a_focused_view_asks_for_ime_coordinates_on_wakeup(cx: &mut TestAppContext) {
+        let (project, workspace) = init_test(cx).await;
+        let terminal = cx.new(|cx| {
+            terminal::TerminalBuilder::new_display_only(
+                CursorShape::default(),
+                terminal::terminal_settings::AlternateScroll::On,
+                None,
+                0,
+                cx.background_executor(),
+                PathStyle::local(),
+            )
+            .subscribe(cx)
+        });
+        let (terminal_view, cx) = cx.add_window_view(|window, cx| {
+            TerminalView::new(
+                terminal.clone(),
+                workspace.downgrade(),
+                None,
+                project.downgrade(),
+                window,
+                cx,
+            )
+        });
+        // New IME coordinates are asked for in a next-frame callback, so count those.
+        let frames_after_wakeup = |cx: &mut VisualTestContext| {
+            cx.run_until_parked();
+            cx.update(|window, cx| window.simulate_next_frame(cx));
+            terminal.update(cx, |_, cx| cx.emit(Event::Wakeup));
+            cx.update(|window, cx| window.simulate_next_frame(cx))
+        };
+
+        assert_eq!(frames_after_wakeup(cx), 0);
+        terminal_view.update_in(cx, |terminal_view, window, cx| {
+            terminal_view.focus_handle.focus(window, cx)
+        });
+        assert_eq!(frames_after_wakeup(cx), 1);
+    }
+
+    #[gpui::test]
     async fn test_tab_content_shows_terminal_title_when_custom_title_directly_set_empty(
         cx: &mut TestAppContext,
     ) {

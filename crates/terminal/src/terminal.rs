@@ -1467,8 +1467,17 @@ impl TerminalBuilder {
                 'outer: loop {
                     let mut events = Vec::new();
 
+                    // A set pace uses a real timer, so a test can move the clock past it.
                     #[cfg(any(test, feature = "test-support"))]
-                    let mut timer = cx.background_executor().simulate_random_delay().fuse();
+                    let mut timer = {
+                        let pace = terminal.read_with(cx, |terminal, _| terminal.wakeup_pace)?;
+                        let delay = if pace == DEFAULT_WAKEUP_PACE {
+                            cx.background_executor().simulate_random_delay().boxed_local()
+                        } else {
+                            cx.background_executor().timer(pace).boxed_local()
+                        };
+                        delay.fuse()
+                    };
                     #[cfg(not(any(test, feature = "test-support")))]
                     let mut timer = {
                         let pace = terminal.read_with(cx, |terminal, _| terminal.wakeup_pace)?;
@@ -5441,12 +5450,43 @@ mod tests {
             terminal.read_with(cx, |terminal, _| terminal.wakeup_pace()),
             Duration::from_millis(250)
         );
-        // Output still reaches the screen at the new pace.
+        let wakeups = std::rc::Rc::new(std::cell::Cell::new(0));
+        cx.update({
+            let wakeups = wakeups.clone();
+            |cx| {
+                cx.subscribe(&terminal, move |_, event, _| {
+                    if matches!(event, Event::Wakeup) {
+                        wakeups.set(wakeups.get() + 1);
+                    }
+                })
+                .detach();
+            }
+        });
         let mut writer =
             terminal.read_with(cx, |terminal, _| terminal.display_only_writer().unwrap());
-        writer.write(b"paced");
+
+        // The first write after a quiet moment wakes at once.
+        writer.write(b"one");
         cx.run_until_parked();
-        assert!(terminal.read_with(cx, |terminal, _| terminal.get_content().contains("paced")));
+        assert_eq!(wakeups.get(), 1);
+
+        // A burst within the pace waits for the pace.
+        writer.write(b"two");
+        writer.write(b"three");
+        cx.run_until_parked();
+        assert_eq!(wakeups.get(), 1);
+        cx.executor().advance_clock(Duration::from_millis(249));
+        assert_eq!(wakeups.get(), 1);
+        cx.executor().advance_clock(Duration::from_millis(2));
+        assert_eq!(wakeups.get(), 2);
+        assert!(terminal.read_with(cx, |terminal, _| terminal.get_content().contains("three")));
+
+        // After a quiet pace the next write wakes at once again.
+        cx.executor().advance_clock(Duration::from_millis(250));
+        assert_eq!(wakeups.get(), 2);
+        writer.write(b"four");
+        cx.run_until_parked();
+        assert_eq!(wakeups.get(), 3);
     }
 
     mod hyperlinks {
