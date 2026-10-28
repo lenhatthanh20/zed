@@ -766,6 +766,10 @@ enum PtyEvent {
 /// never waits long for it.
 const DISPLAY_ONLY_LOCKED_WRITE: usize = 16 * 1024;
 
+/// How long the event loop gathers output events before it wakes the terminal, unless
+/// [`Terminal::set_wakeup_pace`] set another pace.
+const DEFAULT_WAKEUP_PACE: Duration = Duration::from_millis(4);
+
 /// Parses the output of a display-only terminal on any thread, as the event loop of a PTY
 /// terminal does, so a client of a remote PTY keeps parsing off the main thread. Get one with
 /// [`Terminal::display_only_writer`]. After [`Terminal::replace_display_output`] it writes to the
@@ -1065,6 +1069,7 @@ impl TerminalBuilder {
             output_processor: None,
             output_events_tx: Some(events_tx),
             output_generation: 0,
+            wakeup_pace: DEFAULT_WAKEUP_PACE,
             title_override: None,
             events: VecDeque::with_capacity(10),
             last_content: Content {
@@ -1356,6 +1361,7 @@ impl TerminalBuilder {
                 output_processor: None,
                 output_events_tx: None,
                 output_generation: 0,
+                wakeup_pace: DEFAULT_WAKEUP_PACE,
                 title_override: terminal_title_override,
                 events: VecDeque::with_capacity(10), //Should never get this high.
                 last_content: Default::default(),
@@ -1464,10 +1470,10 @@ impl TerminalBuilder {
                     #[cfg(any(test, feature = "test-support"))]
                     let mut timer = cx.background_executor().simulate_random_delay().fuse();
                     #[cfg(not(any(test, feature = "test-support")))]
-                    let mut timer = cx
-                        .background_executor()
-                        .timer(std::time::Duration::from_millis(4))
-                        .fuse();
+                    let mut timer = {
+                        let pace = terminal.read_with(cx, |terminal, _| terminal.wakeup_pace)?;
+                        cx.background_executor().timer(pace).fuse()
+                    };
 
                     let mut wakeup = None;
                     loop {
@@ -1562,6 +1568,8 @@ pub struct Terminal {
     output_processor: Option<Processor<StdSyncHandler>>,
     output_events_tx: Option<futures::channel::mpsc::UnboundedSender<PtyEvent>>,
     output_generation: u64,
+    /// See [`Terminal::set_wakeup_pace`].
+    wakeup_pace: Duration,
     events: VecDeque<InternalEvent>,
     /// This is only used for mouse mode cell change detection
     last_mouse: Option<(Point, SelectionSide)>,
@@ -2248,6 +2256,21 @@ impl Terminal {
         } else if let Some(sink) = &self.display_only_input {
             sink.unbounded_send(input.into_owned()).ok();
         }
+    }
+
+    /// How long output events are gathered before this display-only terminal wakes (4 ms by
+    /// default). A client that shows many terminals wakes the ones not in use less often, so they
+    /// draw less. The first event after a quiet moment still wakes it at once. A PTY terminal
+    /// keeps the default.
+    pub fn set_wakeup_pace(&mut self, pace: Duration) {
+        if matches!(self.terminal_type, TerminalType::DisplayOnly) {
+            self.wakeup_pace = pace;
+        }
+    }
+
+    /// The pace set with [`Terminal::set_wakeup_pace`].
+    pub fn wakeup_pace(&self) -> Duration {
+        self.wakeup_pace
     }
 
     /// Sends what this display-only terminal would write to a PTY (keys, pastes, IME text and
@@ -5388,6 +5411,42 @@ mod tests {
         let content = terminal.read_with(cx, |terminal, _| terminal.get_content());
         assert!(content.contains("fresh"));
         assert!(!content.contains("stale"));
+    }
+
+    #[gpui::test]
+    async fn test_display_only_terminal_keeps_its_wakeup_pace(cx: &mut TestAppContext) {
+        cx.update(|cx| {
+            let settings_store = settings::SettingsStore::test(cx);
+            cx.set_global(settings_store);
+        });
+        let terminal = cx.new(|cx| {
+            TerminalBuilder::new_display_only(
+                SettingsCursorShape::default(),
+                AlternateScroll::On,
+                None,
+                0,
+                cx.background_executor(),
+                PathStyle::local(),
+            )
+            .subscribe(cx)
+        });
+        assert_eq!(
+            terminal.read_with(cx, |terminal, _| terminal.wakeup_pace()),
+            DEFAULT_WAKEUP_PACE
+        );
+        terminal.update(cx, |terminal, _| {
+            terminal.set_wakeup_pace(Duration::from_millis(250))
+        });
+        assert_eq!(
+            terminal.read_with(cx, |terminal, _| terminal.wakeup_pace()),
+            Duration::from_millis(250)
+        );
+        // Output still reaches the screen at the new pace.
+        let mut writer =
+            terminal.read_with(cx, |terminal, _| terminal.display_only_writer().unwrap());
+        writer.write(b"paced");
+        cx.run_until_parked();
+        assert!(terminal.read_with(cx, |terminal, _| terminal.get_content().contains("paced")));
     }
 
     mod hyperlinks {

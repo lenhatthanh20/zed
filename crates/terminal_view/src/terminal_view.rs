@@ -1202,7 +1202,12 @@ fn subscribe_for_terminal_events(
             match event {
                 Event::Wakeup => {
                     cx.notify();
-                    window.invalidate_character_coordinates();
+                    // Only the focused view holds the IME. Each call asks the window for a frame
+                    // and AppKit for new coordinates, so a client with many busy terminals would
+                    // pay for every one of them.
+                    if terminal_view.focus_handle.is_focused(window) {
+                        window.invalidate_character_coordinates();
+                    }
                     cx.emit(Event::Wakeup);
                     cx.emit(ItemEvent::UpdateTab);
                     cx.emit(SearchEvent::MatchesInvalidated);
