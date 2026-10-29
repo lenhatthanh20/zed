@@ -1304,7 +1304,11 @@ fn subscribe_for_terminal_events(
                 }
 
                 Event::Open(maybe_navigation_target) => match maybe_navigation_target {
-                    MaybeNavigationTarget::Url(url) => cx.open_url(url),
+                    MaybeNavigationTarget::Url(url) => {
+                        if is_safe_url(url) {
+                            cx.open_url(url)
+                        }
+                    }
                     MaybeNavigationTarget::PathLike(path_like_target) => open_path_like_target(
                         &workspace,
                         terminal_view,
@@ -1323,6 +1327,13 @@ fn subscribe_for_terminal_events(
         },
     );
     vec![terminal_subscription, terminal_events_subscription]
+}
+
+/// Natamux: program output in a terminal picks the links it prints, so only web and mail
+/// links open. Other schemes (file, ssh, custom app handlers) could start local programs.
+fn is_safe_url(url: &str) -> bool {
+    let scheme = url.split_once(':').map(|(scheme, _)| scheme.to_ascii_lowercase());
+    matches!(scheme.as_deref(), Some("http" | "https" | "mailto"))
 }
 
 fn regex_search_for_query(query: &SearchQuery) -> Option<Search> {
@@ -2332,6 +2343,18 @@ mod tests {
 
     // CSI `1;2A` = cursor-up with the xterm Shift modifier (`1 + 1` for Shift).
     const SHIFT_UP_ESCAPE: &[u8] = b"\x1b[1;2A";
+
+    #[test]
+    fn opens_only_web_and_mail_links() {
+        assert!(is_safe_url("https://example.com/a"));
+        assert!(is_safe_url("HTTP://example.com"));
+        assert!(is_safe_url("mailto:me@example.com"));
+        assert!(!is_safe_url("file:///etc/passwd"));
+        assert!(!is_safe_url("ssh://host"));
+        assert!(!is_safe_url("zed://open"));
+        assert!(!is_safe_url("javascript:alert(1)"));
+        assert!(!is_safe_url("no-scheme"));
+    }
 
     #[gpui::test]
     async fn replacing_output_resets_view_scrolling_hover_and_search(cx: &mut TestAppContext) {
