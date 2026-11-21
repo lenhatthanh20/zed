@@ -1255,6 +1255,19 @@ impl Platform for MacPlatform {
         state.find_pasteboard.write(item);
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn write_credentials(
+        &self,
+        _url: &str,
+        _username: &str,
+        _password: &[u8],
+    ) -> Task<Result<()>> {
+        Task::ready(Err(anyhow::anyhow!(
+            "gpui_macos is built without the credentials feature"
+        )))
+    }
+
+    #[cfg(feature = "credentials")]
     fn write_credentials(&self, url: &str, username: &str, password: &[u8]) -> Task<Result<()>> {
         let url = url.to_string();
         let username = username.to_string();
@@ -1296,6 +1309,12 @@ impl Platform for MacPlatform {
         })
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn read_credentials(&self, _url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {
+        Task::ready(Ok(None))
+    }
+
+    #[cfg(feature = "credentials")]
     fn read_credentials(&self, url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {
         let url = url.to_string();
         self.background_executor().spawn(async move {
@@ -1341,6 +1360,14 @@ impl Platform for MacPlatform {
         })
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn delete_credentials(&self, _url: &str) -> Task<Result<()>> {
+        Task::ready(Err(anyhow::anyhow!(
+            "gpui_macos is built without the credentials feature"
+        )))
+    }
+
+    #[cfg(feature = "credentials")]
     fn delete_credentials(&self, url: &str) -> Task<Result<()>> {
         let url = url.to_string();
 

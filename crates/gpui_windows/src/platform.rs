@@ -1017,6 +1017,19 @@ impl Platform for WindowsPlatform {
         read_from_clipboard()
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn write_credentials(
+        &self,
+        _url: &str,
+        _username: &str,
+        _password: &[u8],
+    ) -> Task<Result<()>> {
+        Task::ready(Err(anyhow::anyhow!(
+            "gpui_windows is built without the credentials feature"
+        )))
+    }
+
+    #[cfg(feature = "credentials")]
     fn write_credentials(&self, url: &str, username: &str, password: &[u8]) -> Task<Result<()>> {
         // CredWriteW rejects larger blobs with the opaque RPC error
         // 0x800706F7 "The stub received bad data", so fail with a clear
@@ -1057,6 +1070,12 @@ impl Platform for WindowsPlatform {
         })
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn read_credentials(&self, _url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {
+        Task::ready(Ok(None))
+    }
+
+    #[cfg(feature = "credentials")]
     fn read_credentials(&self, url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {
         let target_name = windows_credentials_target_name(url)
             .encode_utf16()
@@ -1093,6 +1112,14 @@ impl Platform for WindowsPlatform {
         })
     }
 
+    #[cfg(not(feature = "credentials"))]
+    fn delete_credentials(&self, _url: &str) -> Task<Result<()>> {
+        Task::ready(Err(anyhow::anyhow!(
+            "gpui_windows is built without the credentials feature"
+        )))
+    }
+
+    #[cfg(feature = "credentials")]
     fn delete_credentials(&self, url: &str) -> Task<Result<()>> {
         let target_name = windows_credentials_target_name(url)
             .encode_utf16()

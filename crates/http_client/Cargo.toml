@@ -11,7 +11,10 @@ workspace = true
 
 [features]
 test-support = ["dep:log"]
+# Natamux: the GitHub API helpers (they send GITHUB_TOKEN) are opt-in.
+github = []
 github-download = [
+    "github",
     "dep:async-compression",
     "dep:async-fs",
     "dep:async-tar",
