@@ -27,6 +27,7 @@
 //! ```
 use crate::{Entity, Subscription, TestAppContext, TestDispatcher, calculate_seeds};
 use futures::StreamExt as _;
+#[cfg(any(test, feature = "proptest"))]
 use proptest::prelude::{Just, Strategy, any};
 use std::{
     env,
@@ -40,6 +41,7 @@ use std::{
 ///
 /// Note: this function is not intended to be used directly. Rather, it is
 /// public so that it can be used from the `property_test` macro.
+#[cfg(any(test, feature = "proptest"))]
 pub fn seed_strategy() -> impl Strategy<Value = u64> {
     match std::env::var("SEED") {
         Ok(val) => Just(val.parse().unwrap()).boxed(),
@@ -54,6 +56,7 @@ pub fn seed_strategy() -> impl Strategy<Value = u64> {
 ///
 /// Note: this function is not intended to be used directly. Rather, it is
 /// public so that it can be used from the `property_test` macro.
+#[cfg(any(test, feature = "proptest"))]
 pub fn apply_seed_to_proptest_config(
     mut config: proptest::test_runner::Config,
 ) -> proptest::test_runner::Config {

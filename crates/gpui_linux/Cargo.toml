@@ -45,6 +45,7 @@ x11 = [
     "filedescriptor",
     "open",
 ]
+credentials = ["dep:oo7"]
 screen-capture = [
     "gpui/screen-capture",
     "scap",
@@ -72,11 +73,13 @@ strum.workspace = true
 url.workspace = true
 uuid.workspace = true
 
-# Always used
-oo7 = { workspace = true, features = [
+# Natamux: the keyring client is opt-in (feature "credentials"); Natamux stores no credentials.
+oo7 = { workspace = true, optional = true, features = [
     "async-std",
     "native_crypto",
 ] }
+
+# Always used
 calloop = "0.14.3"
 notify-rust.workspace = true
 raw-window-handle.workspace = true

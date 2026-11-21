@@ -67,7 +67,7 @@ mod util;
 mod view;
 mod window;
 
-#[cfg(any(test, feature = "test-support"))]
+#[cfg(any(test, feature = "proptest"))]
 pub use proptest;
 #[cfg(any(test, feature = "test-support", feature = "bench-support"))]
 pub use seeds::calculate_seeds;

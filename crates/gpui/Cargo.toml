@@ -23,7 +23,6 @@ test-support = [
     "http_client/test-support",
     "wayland",
     "x11",
-    "proptest",
     "dep:futures-concurrency",
     "dep:postage",
     "dep:web-time",
