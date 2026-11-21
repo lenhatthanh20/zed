@@ -37,9 +37,8 @@ inspector = ["gpui_macros/inspector"]
 leak-detection = []
 font-kit = []
 wayland = []
-x11 = [
-    "scap?/x11",
-]
+# Natamux: no "scap?/x11" here; the weak feature kept scap in the lock of every consumer.
+x11 = []
 screen-capture = [
     "scap",
     "dep:objc2-core-foundation",

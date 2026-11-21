@@ -42,14 +42,8 @@ gpui_util.workspace = true
 font-kit = { workspace = true, optional = true }
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
-wgpu = { workspace = true, features = ["std", "parking_lot", "metal", "gles", "vulkan", "wgsl", "webgpu"] }
-
-[target.'cfg(not(any(target_os = "linux", target_os = "freebsd")))'.dependencies]
-wgpu = { workspace = true, default-features = true }
-
-[target.'cfg(target_family = "wasm")'.dependencies]
-web-sys = { workspace = true, features = ["HtmlCanvasElement"] }
-wgpu = { workspace = true, features = ["webgl"] }
+# Natamux: Linux is the only target that draws with wgpu; no Metal, WebGPU or WebGL backend.
+wgpu = { workspace = true, features = ["std", "parking_lot", "gles", "vulkan", "wgsl"] }
 
 [dev-dependencies]
 criterion.workspace = true

@@ -44,11 +44,11 @@ x11 = [
     "xim",
     "filedescriptor",
     "open",
-    "scap?/x11",
 ]
 screen-capture = [
     "gpui/screen-capture",
     "scap",
+    "scap/x11",
 ]
 
 
